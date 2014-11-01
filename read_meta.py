@@ -3,12 +3,13 @@ from subprocess import Popen, PIPE
 from glob import glob
 import sys
 
-# read_coords() searches for a file named metadata*.txt in the current
-# directory, or in the passed directory. It will iterate through all possible
-# files that meet that name requirement. It will find the xmin, xmax, ymin, ymax,
-# and the UTM zone from the file and store in it a dictionary that is passed to the
-# convert_coords() function.
-def read_coords():
+def read_meta():
+    """
+    Opens up any metadata*.txt files in the local directory or specified directory if there is one.
+    It will search the files for the EPSG code defining the projection as well as the current zone.
+    This data is saved in a dictionary named coords that is passed to the next functions.
+    """
+
     # Change to passed directory, if applicable
     try:
         if len(sys.argv) == 2:
@@ -27,107 +28,62 @@ def read_coords():
     # Try opening the file and searching
     try:
         path = os.path.join(os.getcwd(), "metadata*.txt")
-        coords = dict()
+        proj_info = dict()
 
         # Try to open the file and read contents
         for meta_file in glob(path):
             with open(meta_file) as meta:
                 for line in meta.readlines():
 
-                    # If the line contains xmin
-                    if line.startswith("	Xmin: "):
-                        data = line[7:]
-                        data = data.strip()
-                        coords['xmin'] = data
-
-                    # If the line contains xmax
-                    elif line.startswith("	Xmax: "):
-                        data = line[7:]
-                        data = data.strip()
-                        coords['xmax'] = data
-
-                    # If the line contains ymin
-                    elif line.startswith("	Ymin: "):
-                        data = line[7:]
-                        data = data.strip()
-                        coords['ymin'] = data
-
-                    # If the line contains ymax
-                    elif line.startswith("	Ymax: "):
-                        data = line[7:]
-                        data = data.strip()
-                        coords['ymax'] = data
-
                     # If the line contains the EPSG Code
                     if line.startswith("Horizontal Coordinates:"):
-                        coords['region'] = line[-8:-3]
-                        coords['zone'] = coords['region'][-2:] + 'n'
-
+                        proj_info['region'] = line[-8:-3]
+                        proj_info['zone'] = proj_info['region'][-2:] + 'n'
+                        print proj_info
     except IOError:
         print 'Unable to open file.'
         sys.exit(1)
 
     # Make sure that all of the data was read successfully
-    if len(coords) != 6:
+    if len(proj_info) != 2:
         print 'Coordinates not found. Verify that the metadata file exists in %s and is complete.' % os.getcwd()
         sys.exit(1)
 
     else:
-        convert_coords(coords)
-        convert_opentopo(coords)
+        # Convert the DEMs to Daymet's projection
+        coords = convert_opentopo(proj_info)
+
+        print "Coordinates are: "
+        print coords
 
 
-# Takes a dictionary containing the xmin, xmax, ymin, ymax, and UTM zone, and
-# converts the coordinates using the external utility GeoConvert. Will give two
-# pairs of coords, the NW corner, and SE corner of the passed coords.
-def convert_coords(coords):
-    print coords
-    # Convert NW Corner
-    command = ['GeoConvert', '--input-string', coords.get('zone') + ' ' + coords.get('xmin') + ' ' + coords.get('ymax')]
-    process = Popen(command, stdout=PIPE, shell=False)
-
-    north_west, err = process.communicate()
-
-    # Catch errors from GeoConvert
-    if err is not None:
-        print err
-        sys.exit(1)
-
-    # Convert SE Corner
-    command = ['GeoConvert', '--input-string', coords.get('zone') + ' ' + coords.get('xmax') + ' ' + coords.get('ymin')]
-    process = Popen(command, stdout=PIPE, shell=False)
-
-    south_east, err = process.communicate()
-
-    # Catch errors from GeoConvert
-    if err is not None:
-        print err
-        sys.exit(1)
-
-    # Format the results, NW First
-    north_west = north_west.split()
-    south_east = south_east.split()
-
-    print 'NW Coordinates: ' + north_west
-    print 'SE Coordinates: ' + south_east
+# End read_meta()
 
 
-# Creates another .tif file with the name .converted.tif for every .tif file located in the passed directory.
-# The converted.tif file is supposed to be converted into the Daymet custom projection. Depends on the read_coords()
-# method executing correctly.
-def convert_opentopo(coords):
+
+def convert_opentopo(proj_info):
+    """
+    Creates another .tif file with the name .converted.tif for every .tif file located
+    in the passed directory.The converted.tif file is supposed to be converted into the Daymet
+    custom projection. Depends on theread_meta() method executing correctly. It doesn't check
+    for the converted files before executing. Once the files are generated, script will call
+    gdalinfo and try to parse the new coordinates from the output. The corner coordinates are
+    returned in a list.
+    """
+
     # Command string to convert the DEM files from Open Topography to DAYMET's projection
-    command = ['gdalwarp', '-s_srs', 'EPSG:' + coords['region'], '-t_srs',
+    command = ['gdalwarp', '-s_srs', 'EPSG:' + proj_info['region'], '-t_srs',
                "+proj=lcc +lat_1=25 +lat_2=60 +lat_0=42.5 +lon_0=-100 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
                '-r', 'bilinear', '-of', 'GTiff']
 
 
     # Need to execute for each downloaded .tif file from OpenTopo
     path = os.path.join(os.getcwd(), "*.tif")
-
     for dem_file in glob(path):
         # Create the output file name
         dem_output = dem_file[:-4] + '.converted.tif'
+
+        print "Creating %s" % dem_output
 
         # Add the filenames to the end of the list
         command.append(dem_file)
@@ -147,4 +103,30 @@ def convert_opentopo(coords):
         command.remove(dem_file)
         command.remove(dem_output)
 
-read_coords()
+    # Call gdalinfo and parse the output for updated coordinates
+    path = os.path.join(os.getcwd(), "*.converted.tif")
+    for dem_file in glob(path):
+        # Setup the command
+        command = ['gdalinfo', dem_file]
+
+        # Execute the command
+        process = Popen(command, stdout=PIPE, shell=False)
+        output, err = process.communicate()
+
+        # Separate the lines and save a small subsection
+        output = output.splitlines()
+        output = output[-7:-3]
+
+        result = dict()
+
+        # Parse the upper left coordinates
+        result['ulx'] = output[0][13:25].strip()
+        result['uly'] = output[0][26:38].strip()
+        # Parse the lower right coordinates
+        result['lrx'] = output[3][13:25].strip()
+        result['lry'] = output[3][26:38].strip()
+
+        return result
+# End convert_opentopo()
+
+read_meta()
