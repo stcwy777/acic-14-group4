@@ -56,13 +56,6 @@ def read_meta():
 		# Convert the DEMs to Daymet's projection
 		coords = convert_opentopo(proj_info)
 
-		print "Coordinates are: "
-		print coords
-
-		# Save the coordinates to file
-		save_coords(coords)
-
-
 # End read_meta()
 
 
@@ -83,9 +76,33 @@ def convert_opentopo(proj_info):
 			   "+proj=lcc +lat_1=25 +lat_2=60 +lat_0=42.5 +lon_0=-100 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
 			   '-r', 'bilinear', '-of', 'GTiff']
 
+	# Need to merge subfiles for each DEM output into a single TIFF
 
-	# Need to execute for each downloaded .tif file from OpenTopo
-	path = os.path.join(os.getcwd(), "*.tif")
+	# D Infinity Catchment Area
+	path = os.path.join(os.getcwd(), "scap*.tif")
+	merge_files(glob(path), 'scap_total.tif')
+
+	# D Infinity Flow 
+	path = os.path.join(os.getcwd(), "angp*.tif")
+	merge_files(glob(path), 'angp_total.tif')
+
+	# D Infinity Slope
+	path = os.path.join(os.getcwd(), "slpp*.tif")
+	merge_files(glob(path), 'slpp_total.tif')
+
+	# Pit Remove 
+	path = os.path.join(os.getcwd(), 'felp*.tif')
+	merge_files(glob(path), 'felp_total.tif')
+
+	# Total Wetness Index
+	path = os.path.join(os.getcwd(), 'twi*.tif')
+	merge_files(glob(path), 'twi_total.tif')
+
+	# D Infinity 
+
+	# Need to execute for each total .tif file from OpenTopo
+	path = os.path.join(os.getcwd(), "*total.tif")
+
 	for dem_file in glob(path):
 		# Create the output file name
 		dem_output = dem_file[:-4] + '.converted.tif'
@@ -110,73 +127,23 @@ def convert_opentopo(proj_info):
 		command.remove(dem_file)
 		command.remove(dem_output)
 
-	# Call gdalinfo and parse the output for updated coordinates
-	path = os.path.join(os.getcwd(), "*.converted.tif")
-	for dem_file in glob(path):
-		# Setup the command
-		command = ['gdalinfo', dem_file]
-
-		# Execute the command
-		process = Popen(command, stdout=PIPE, shell=False)
-		output, err = process.communicate()
-
-		# Separate the lines and save a small subsection
-		output = output.splitlines()
-		output = output[-7:-3]
-
-		result = dict()
-
-		
-		# Parse the upper left geocoordinates
-		result['ullon'] = convert_decimal(output[0][41:53])
-		result['ullat'] = convert_decimal(output[0][56:68])
-
-		# Parse the lower left coordinates
-		result['lllon'] = convert_decimal(output[1][41:53])
-		result['lllat'] = convert_decimal(output[1][56:68])
-
-		# Parse the upper right coordinates
-		result['urlon'] = convert_decimal(output[2][41:53])
-		result['urlat'] = convert_decimal(output[2][56:68])
-
-	
-		# Parse the lower right coordinates
-		result['lrlon'] = convert_decimal(output[3][41:53])
-		result['lrlat'] = convert_decimal(output[3][56:68])
-
-	 
-		return result
-
 # End convert_opentopo() 57 - 68
-
-def convert_decimal(value):
-	"""
-	Takes a string of output from gdalinfo, and converts the latitude and longitude 	measurements from degrees,
-	minutes, seconds to decimal degrees.
-	"""
-
-	# Do the math
-	output = decimal.Decimal(value[:3]) + (decimal.Decimal(value[4:6]) / 60) + (decimal.Decimal(value[7:]) / 3600)
 	
-	# Round to .00000
-	output = "%3.5f" % output
-
-	return output
-
-# End convert_decimal()
-
-def save_coords(coords):
+def merge_files(path, output): 
 	"""
-	Saves the passed coordinates to a file named coords.txt using RawConfigParser
+	Merges the filenames passed into a single TIFF file with gdalwarp. Assumes that the system running the application has at least 2 GB of available memory.
 	"""
 
-	# Initialize a config parser with the dictionary of data
-	config = ConfigParser.RawConfigParser(coords)
+	# Create the command to execute
+	command = ['gdalwarp', '--config', 'GDAL_CACHEMAX', '2000', '-wm', '2000'] 
+	command.extend(path)
+	command.append(output)
 
-	# Write to file and close
-	with open('coords.txt', 'w') as config_file:
-		config.write(config_file)
+	print command 
 
-# End save_coords()
-	
+	# Execute the command
+	process = Popen(command, stdout=PIPE, shell=False)
+	stdout, stderr = process.communicate()
+
+# End merge_files()
 read_meta()

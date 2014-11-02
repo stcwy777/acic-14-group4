@@ -65,7 +65,7 @@ if [ $? -ne 0 ] ; then
 
 			echo "Configuring GDAL...."
 			echo "Be patient, this takes a couple of minutes."
-			./configure --prefix=$HOME > /dev/null
+			./configure --prefix=$HOME --with-python > /dev/null
 			make > /dev/null
 
 			echo "Installing GDAL in ~/bin...."
@@ -99,7 +99,7 @@ if [ $? -ne 0 ] ; then
 		cd $HOME
 		wget http://www.iplantcollaborative.org/sites/default/files/irods/icommands.x86_64.tar.bz2
 	
-		if [ $? -ne 0 ] ; then
+		if [ $? -eq 0 ] ; then
 			echo "Extracting iCommands...."
 			tar -jxf icommands.x86_64.tar.bz2
 
@@ -234,8 +234,8 @@ echo "Cleaning up...."
 cd $HOME
 
 # CCTools
-rm cctools-4.2.2-source.tar.gz
-rm -r cctools-4.2.2-source
+rm cctools-4.2.2-source.tar.gz >& /dev/null
+rm -r cctools-4.2.2-source >& /dev/null
 
 # GDAL
 rm gdal-1.11.1.tar.gz >& /dev/null
