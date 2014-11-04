@@ -62,7 +62,7 @@ t = Task(command)
 for filename in os.listdir(sys.argv[1]):
 	if filename.lower().endswith('.tif'):
 		t.specify_file(filename, filename, WORK_QUEUE_INPUT, cache = False)
-	elif:
+	else:
 		print filename + "is not a .tif file. This file will be ignored."
 # set the WorkQueue output file
 t.specify_file(outfile, outfile, WORK_QUEUE_OUTPUT, cache=False)
