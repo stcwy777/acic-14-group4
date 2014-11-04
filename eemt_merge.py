@@ -49,7 +49,7 @@ outfile = "trad_eemt.tif"
 # Note that we write ./gdalwarp here, to guarantee that the gdal version we
 # are using is the one being sent to the workers. 
  
-command = ["./gdalwarp", "--config", "GDAL_CACHEMAX", "2000", '-wm", "2000"]
+command = ["./gdalwarp", "--config", "GDAL_CACHEMAX", "2000", "-wm", "2000"]
 command.extend(os.listdir(sys.argv[1]))
 command.append(outfile)
 
