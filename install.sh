@@ -260,6 +260,7 @@ echo "Finished removing unneeded files."
 echo "Updating path variable."
 
 echo "export PATH=$PATH:~/bin:~/cctools/bin" >> .bashrc
+echo "export PYTHONPATH=${PYTHONPATH}:~/cctools/lib/python2.6/site-packages" >> .bashrc
 
 echo "Please open a new terminal for the updated path to take effect." 
 echo ""
