@@ -1,15 +1,12 @@
 #!/bin/bash
 #Arg passing
-north=$1
-south=$2
-east=$3
-west=$4
-dst_dem=$5
-dst_dicatch=$6
-prcp_tiff=$7
-nadem_tiff=$8
-tmax_tiff=$9
-tmin_tiff=$10
+reso=$1
+dst_dem=$2
+dst_dicatch=$3
+prcp_tiff=$4
+nadem_tiff=$5
+tmax_tiff=$6
+tmin_tiff=$7
 
 #Naming
 dst_dem="dst_dem.n${north}s${south}e${east}w${west}.tiff"
@@ -46,7 +43,7 @@ r.external input="${tmin_tiff}" band=1 output=$tminmap
 r.external input="${tmax_tiff}" band=1 output=$tmaxmap
 
 #specify the focal region
-g.region n=$north s=$south e=$east w=$west
+g.region raster=$demmap res=$reso
 r.mapcalculator amap=$tminmap bmap=$tmaxmap formula="(A+B)/2" output=$tempmap
 #Aspect & Slope
 r.slope.aspect elevation=$demmap slope=$slopeoutput aspect=$aspectoutput
