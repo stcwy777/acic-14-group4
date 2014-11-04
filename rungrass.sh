@@ -8,7 +8,8 @@ dst_dem=$5
 dst_dicatch=$6
 prcp_tiff=$7
 nadem_tiff=$8
-temp_tiff=$9
+tmax_tiff=$9
+tmin_tiff=$10
 
 #Naming
 dst_dem="dst_dem.n${north}s${south}e${east}w${west}.tiff"
@@ -17,6 +18,8 @@ dicatchmentmap="dicatchmentmap.n${north}s${south}e${east}w${west}"
 demmap="demmap.n${north}s${south}e${east}w${west}"
 prcpmap="prcpmap.n${north}s${south}e${east}w${west}"
 nademmap="nademmap.n${north}s${south}e${east}w${west}"
+tminmap="tminmap.n${north}s${south}e${east}w${west}"
+tmaxmap="tmaxmap.n${north}s${south}e${east}w${west}"
 tempmap="tempmap.n${north}s${south}e${east}w${west}"
 slopeoutput="slopeoutput.n${north}s${south}e${east}w${west}"
 aspectoutput="aspectoutput.n${north}s${south}e${east}w${west}"
@@ -39,10 +42,12 @@ r.external input="${dst_dicatch}" band=1 output=$dicatchmentmap --overwrite -o -
 r.external input="${dst_dem}" band=1 output=$demmap --overwrite -o -r
 r.external input="${prcp_tiff}" band=1 output=$prcpmap --overwrite -o -r
 r.external input="${nadem_tiff}" band=1 output=$nademmap --overwrite -o -r
-r.external input="${temp_tiff}" band=1 output=$tempmap
+r.external input="${tmin_tiff}" band=1 output=$tminmap
+r.external input="${tmax_tiff}" band=1 output=$tmaxmap
 
 #specify the focal region
 g.region n=$north s=$south e=$east w=$west
+r.mapcalculator amap=$tminmap bmap=$tmaxmap formula="(A+B)/2" output=$tempmap
 #Aspect & Slope
 r.slope.aspect elevation=$demmap slope=$slopeoutput aspect=$aspectoutput
 #Solar Radiation
