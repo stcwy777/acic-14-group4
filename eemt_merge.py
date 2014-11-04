@@ -13,11 +13,11 @@ import sys
 try:
 	os.chdir(sys.argv[1])
 except:
-	if len(sys.argv) < 2
+	if len(sys.argv) < 2:
 		print "No directory specified"
 		print "Usage: %s [directory]" % sys.argv[0]
 		sys.exit(1)
-	elif len(sys.argv) > 2
+	elif len(sys.argv) > 2:
 		print "Too many arguments passed"
 		print "Usage: %s [directory]" % sys.argv[0]
 		sys.exit(1)
@@ -59,10 +59,10 @@ t = Task(command)
 # Loop through each file in the directory and check if it is the correct file type
 # correct ext: assign that file to WorkQueue task
 # wrong ext: ignore and let the user know it will be ignored.
-for filename in os.listdir(sys.argv[1])
-	if filename.lower().endswith('.tif')
+for filename in os.listdir(sys.argv[1]):
+	if filename.lower().endswith('.tif'):
 		t.specify_file(filename, filename, WORK_QUEUE_INPUT, cache = False)
-	elif
+	elif:
 		print filename + "is not a .tif file. This file will be ignored."
 # set the WorkQueue output file
 t.specify_file(outfile, outfile, WORK_QUEUE_OUTPUT, cache=False)
@@ -82,7 +82,7 @@ if t.return_status != 0:
 	# The task failed. Error handling (e.g., resubmit with new parameters, examine logs, etc.) here
 	print "The task failed with return status " + t.return_status
 	None
-elif
+elif:
 	#task object will be garbage collected by Python automatically when it goes out of scope
 	print "all tasks complete!"
 
