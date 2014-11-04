@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-# This program is a very simple example of how to use Work Queue.
-# It reads in individual EEMT filesand combines them using workers
+# This is a simple python script to send gdal through WorkQueue
+# It reads in individual EEMT files and combines them using workers
 # A directory containing the files is passed on the command line
 
 from work_queue import *
