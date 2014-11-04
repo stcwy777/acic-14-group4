@@ -82,7 +82,7 @@ if t.return_status != 0:
 	# The task failed. Error handling (e.g., resubmit with new parameters, examine logs, etc.) here
 	print "The task failed with return status " + t.return_status
 	None
-elif:
+else:
 	#task object will be garbage collected by Python automatically when it goes out of scope
 	print "all tasks complete!"
 
