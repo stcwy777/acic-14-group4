@@ -191,7 +191,7 @@ fi
 
 if [ $? -ne 0 ] ; then 
 
-	grass64 --version >& /dev/null
+	grass --version >& /dev/null
 
 	if [ $? -ne 0 ] ; then 
 		echo "Installing Grass...." 

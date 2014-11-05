@@ -123,7 +123,7 @@ def convert_opentopo(proj_info):
 	# Command string to convert the DEM files from Open Topography to DAYMET's projection
 	command = ['gdalwarp', '-s_srs', 'EPSG:' + proj_info['region'], '-overwrite', '-t_srs',
 			   "+proj=lcc +lat_1=25 +lat_2=60 +lat_0=42.5 +lon_0=-100 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs",
-			   '-r', 'bilinear', '-of', 'GTiff']
+			   '-r', 'bilinear', '-of', 'GTiff', '-tr', '10', '-10']
 
 	# Need to execute for each .tif file from OpenTopo
 	path = os.path.join(os.getcwd(), "*.tif")
@@ -140,6 +140,8 @@ def convert_opentopo(proj_info):
 			# Add the filenames to the end of the list
 			command.append(dem_file)
 			command.append(dem_output)
+
+			print ' '.join(command)
 
 			# Execute the gdalwarp command
 			process = Popen(command, stdout=PIPE, shell=False)
