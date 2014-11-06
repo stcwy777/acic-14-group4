@@ -10,7 +10,7 @@ export GISBASE=~/grass-6.4.4
 export PATH="$PATH:$GISBASE/bin:$GISBASE/scripts"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$GISBASE/lib"
 export GISRC=~/.grassrc.6.4.4
-export PYTHONPATH="$GISBASE/etc/python"
+export PYTHONPATH="$PYTHONPATH:$GISBASE/etc/python"
 export SHELL=/bin/bash
 # path to GRASS binaries and libraries:
 #export GISBASE=$HOME/grass-6.4.4
