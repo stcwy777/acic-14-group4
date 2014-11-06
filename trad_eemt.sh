@@ -1,9 +1,6 @@
 #!/bin/bash
 
-# Usage Statement
-
 # Process arguments
-
 while getopts ":i:o:p:" o ; do
 	case "${o}" in 
 		# i = Input directory
@@ -82,7 +79,7 @@ echo
 
 cd $INPUT_DIR
 
-$HOME/cctools/bin/makeflow --batch-type wq --project-name $PROJ_NAME --wq-schedule files trad.makeflow
+$HOME/cctools/bin/makeflow --batch-type wq --project-name $PROJ_NAME trad.makeflow
 
 # If makeflow fails, try running again. The input file check sometimes fails for 
 # files that do not exist yet. 
@@ -91,7 +88,7 @@ if [ $? -ne 0 ] ; then
 	echo 
 	echo "Makeflow failed. Retrying...."
 	echo
-	$HOME/cctools/bin/makeflow --batch-type wq --project-name $PROJ_NAME --wq-schedule files trad.makeflow
+	$HOME/cctools/bin/makeflow --batch-type wq --project-name $PROJ_NAME trad.makeflow
 
 fi
 
