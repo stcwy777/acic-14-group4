@@ -4,7 +4,7 @@
 
 # Process arguments
 
-while getopts "i:o:p:" o ; do
+while getopts ":i:o:p:" o ; do
 	case "${o}" in 
 		# i = Input directory
 		i)

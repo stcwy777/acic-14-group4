@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import sys
 from glob import glob
@@ -6,7 +8,12 @@ from subprocess import Popen
 
 def gen_commands(): 
 	"""
+	Driver function that generates the command strings for makeflow. 
+	Writes the entire list of strings to trad_eemt.makeflow. 
 
+	Syntax is: 
+		output files: input files binaries
+			shell command
 	"""	
 
 	# Check for sufficient arguments
@@ -78,7 +85,8 @@ def create_makeflow(command):
 
 def change_proj(tif):
 	"""
-	Creates a makeflow command to convert the specified tif file into Daymet's projections.
+	Creates a makeflow command to convert the specified tif file into Daymet's projections
+	while maintaining the original pixel size from Open Topography.
 	"""
 
 	# Read the metadata to determine projection information
@@ -95,7 +103,7 @@ def change_proj(tif):
 	# Full shell command
 	command = ['gdalwarp', '-s_srs', 'EPSG:' + proj_info['region'], 
 		'-overwrite', '-t_srs', daymet, '-r', 'bilinear', '-of', 'GTiff', 
-		'-tr', '10', '-10', tif, output]
+		'-tr', proj_info['resolution'], '-' + proj_info['resolution'], tif, output]
 
 	# First line of makeflow
 	result = output + ': $HOME/bin/gdalwarp ' + tif
@@ -109,8 +117,8 @@ def change_proj(tif):
 def read_meta():
 	"""
 	Opens up any metadata*.txt files in the local directory or specified directory if there is one.
-	It will search the files for the EPSG code defining the projection as well as the current zone.
-	This data is saved in a dictionary named coords that is passed to the next functions.
+	It will search the files for the EPSG code defining the projection, the current zone, and the
+	resolution of the DEMs. This data is saved in a dictionary named coords that is passed to the next functions.
 	"""
 
 	# Try opening the file and searching
@@ -123,6 +131,10 @@ def read_meta():
 			with open(meta_file) as meta:
 				for line in meta.readlines():
 
+					# If the line contains the resolution, and it hasn't been set
+					if line.startswith('\tResolution:') and 'resolution' not in proj_info:						
+						proj_info['resolution'] = line[12:18].strip(' \t\nmetr')
+
 					# If the line contains the EPSG Code
 					if line.startswith("Horizontal Coordinates:"):
 						proj_info['region'] = line[-8:-3]
@@ -132,7 +144,8 @@ def read_meta():
 		sys.exit(1)
 
 	# Make sure that all of the data was read successfully
-	if len(proj_info) != 2:
+	if len(proj_info) != 3:
+		print proj_info
 		print 'Coordinates not found. Verify that the metadata file exists in %s and is complete.' % os.getcwd()
 		sys.exit(1)
 
@@ -146,8 +159,6 @@ def merge_raw(result, file_wild):
 	"""
 	Creates makeflow commands that will merge separate pieces of the same dataset into a single TIF file. 
 	"""
-
-
 
 	# Generate the first line
 	command = result + ': '
