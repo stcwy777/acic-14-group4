@@ -1,17 +1,16 @@
-#!/bin/bash
-echo "GISDBASE: ${HOME}/acicteam/grassdata" > ${HOME}/.grassrc.6.4.4
-echo "LOCATION_NAME: loc1" >> ${HOME}/.grassrc.6.4.4
-echo "MAPSET: test" >> ${HOME}/.grassrc.6.4.4
-echo "DIGITIZER: none" >> ${HOME}/.grassrc.6.4.4
-echo "GRASS_GUI: text" >> ${HOME}/.grassrc.6.4.4
+echo "GISDBASE: ${HOME}/grassdata" > ${HOME}/.grassrc6
+echo "LOCATION_NAME: loc1" >> ${HOME}/.grassrc6
+echo "MAPSET: test" >> ${HOME}/.grassrc6
+echo "DIGITIZER: none" >> ${HOME}/.grassrc6
+echo "GRASS_GUI: text" >> ${HOME}/.grassrc6
 
-
-export GISBASE=~/grass-6.4.4
-export PATH="$PATH:$GISBASE/bin:$GISBASE/scripts"
-export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$GISBASE/lib"
-export GISRC=~/.grassrc.6.4.4
-export PYTHONPATH="$PYTHONPATH:$GISBASE/etc/python"
-export SHELL=/bin/bash
+#GISBASE=${HOME}/grass-6.4.4
+echo "export GISBASE=${HOME}/grass-6.4.4" >> ${HOME}/.bashrc
+echo "export PATH=$PATH:\$GISBASE/bin:\$GISBASE/scripts:$HOME/lib" >> ${HOME}/.bashrc
+echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:\$GISBASE/lib:$HOME/lib" >> ${HOME}/.bashrc
+echo "export GISRC=${HOME}/.grassrc6" >> ${HOME}/.bashrc
+echo "export PYTHONPATH=\$GISBASE/etc/python" >> ${HOME}/.bashrc
+echo "export SHELL=/bin/bash" >> ${HOME}/.bashrc
 # path to GRASS binaries and libraries:
 #export GISBASE=$HOME/grass-6.4.4
 #export GISDBASE=$HOME/acicteam
