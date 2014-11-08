@@ -22,7 +22,7 @@ r.mapcalc "h_bio=22*10^6"
 #loop over days on temp
 for((t=1;t<=365;t++))
 do
-eemt_tif="${t}_eemt.tif"
+eemt_tif="eemt_${t}.tif"
 r.mapcalc "tmin_loc_${t}=tmin.${t}-0.00649*(dem_10m-dem_1km)"
 r.mapcalc "tmax_loc_${t}=tmax.${t}-0.00649*(dem_10m-dem_1km)"
 r.mapcalc "tmin_topo_${t}=tmin_loc_${t}*(S_i-(1/S_i))"
@@ -38,11 +38,11 @@ r.mapcalc "tmax_topo_${t}=tmax_loc_${t}*(S_i-(1/S_i))"
 #r.mapcalc "p_a=101325*exp(9.80665*0.289644*dem_10m/(8.31447*288.15))/287.35*((tmax_topo+tmin_topo/2)273.125)"
 #r.mapcalc "PET=total_sun_joules+p_a*0.001013*(vp_s_topo-vp_loc)/ra))/(2.45*(m_vp+g_psy)"
 #r.mapcalc "AET=prcp*(1+PET/prcp(1(PET/prcp)2.63)(1/2.63))"
-r.mapcalc "DT=((tmax_topo_${t}+tmin_topo_${t})/2)-273.15"
-r.mapcalc "F=a_i*prcp.${t}"
-r.mapcalc "EEMT=F*c_w*DT+NPP*h_bio"
+r.mapcalc "DT_${t}=((tmax_topo_${t}+tmin_topo_${t})/2)-273.15"
+r.mapcalc "F_${t}=a_i*prcp.${t}"
+r.mapcalc "EEMT_${t}=F_${t}*c_w*DT_${t}+NPP*h_bio"
 #output
-g.region rast=EEMT
-r.out.gdal -c createopt="TFW=YES,COMPRESS=LZW" input=EEMT output=$eemt_tif
+g.region rast=EEMT_${t}
+r.out.gdal -c createopt="TFW=YES,COMPRESS=LZW" input=EEMT_${t} output=$eemt_tif
 done
 #g.mremove "*"
