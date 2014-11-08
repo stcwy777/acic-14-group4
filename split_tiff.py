@@ -1,6 +1,6 @@
 import os
 import sys
-from tiffparser import TiffParser
+from tiffParser import TiffParser
 
 def main():
     

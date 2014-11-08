@@ -34,6 +34,7 @@ def gen_commands():
 
 	command_list = list()
 
+	# These  commands will run locally
 	# Generate the commands to decompress Open Topo Data
 	command_list.extend(decompress())
 
@@ -46,6 +47,7 @@ def gen_commands():
 	for tif in convert_list:
 		command_list.append(change_proj(tif))
 
+	# These commands will run in parallel 
 	# Split the tifs
 
 
@@ -106,7 +108,7 @@ def change_proj(tif):
 		'-tr', proj_info['resolution'], '-' + proj_info['resolution'], tif, output]
 
 	# First line of makeflow
-	result = output + ': $HOME/bin/gdalwarp ' + tif
+	result = output + ': /usr/bin/gdalwarp ' + tif
 
 	# Second line of makeflow
 	result += '\n\t' + ' '.join(command)
@@ -169,7 +171,7 @@ def merge_raw(result, file_wild):
 		# Add it to the command string
 		command += path + ' '
 
-	command += '$HOME/bin/gdalwarp\n'
+	command += '/usr/bin/gdalwarp\n'
 
 	# Generate the second line
 	command += '\tgdalwarp --config GDAL_CACHEMAX 2000 -wm 2000 -overwrite ' + ' '.join(files) + ' ' + result
@@ -195,7 +197,7 @@ def decompress():
 			command = ' '.join(arch_files) + ': ' + arch + ' /bin/tar'
 
 			# Second Line
-			command += '\n\t /bin/tar zxf ' + arch
+			command += '\n\t/bin/tar zxf ' + arch
 
 			# Add the new command to the command list
 			output.append(command)
