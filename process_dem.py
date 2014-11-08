@@ -168,13 +168,13 @@ def main():
      
     # get converted name
     tiffName = demParser.getName()
-    print endYr, startYr
+    #print endYr, startYr
     # download daymet data   
     for opt in params:
         getDaymetData(tiffName, coords[1][0], coords[1][1], coords[0][0], coords[0][1], \
                       startYr, endYr, opt)
-    print projs
-    print coords
+    #print projs
+    #print coords
     projDem('na_dem.tif', projs[1][0], projs[1][1], projs[0][0], projs[0][1],\
                   tiffName + '_dem.tif')
     """ 

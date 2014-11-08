@@ -52,7 +52,6 @@ class TiffParser(object):
             raise RuntimeError("%r failed, status code %s stdout %r stderr %r" % \
                                 (cmdInfo, process.returncode, output, err))
         
-        
         # Process gdalinfo output by lines
         output = output.split('\n')
         for i in xrange(len(output) - 1, -1, -1):
