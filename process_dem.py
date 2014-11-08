@@ -79,14 +79,44 @@ def getDaymetData(tiffName, ulLat, ulLon, lrLat, lrLon, startYear=2013, endYear=
         if process.returncode != 0:
             raise RuntimeError("%r failed, status code %s stdout %r stderr %r" % \
                                 (cmdTrans, process.returncode, output, err))
+        
+        cmdClear = ['rm','-y', '%s' % ncFile]
+        print '%s' % ncFile
+        process = Popen(cmdTrans, stdout=PIPE, shell=False)
+        output, err = process.communicate()
+        if process.returncode != 0:
+            raise RuntimeError("%r failed, status code %s stdout %r stderr %r" % \
+                                (cmdClear, process.returncode, output, err))
+    """    
+    for year in range(startYear, endYear + 1):
+    
+        cmdComb = ['gdalwarp', '-dstnodata', '-9999','daymet/%s_%s_%d_*.tif' %\
+                   (tiffName, option, year)]
+
+        process = Popen(cmdComb, stdout=PIPE, shell=False)
+        output, err = process.communicate()
+        if process.returncode != 0:
+            raise RuntimeError("%r failed, status code %s stdout %r stderr %r" % \
+                                (cmdComb, process.returncode, output, err))
+    """
+
+def projDem(inTiff, ulx, uly, lrx, lry, outTiff):
+    
+    cmdProj = ['gdal_translate', '-projwin', '%s'%ulx, '%s'%uly, '%s'%lrx, '%s'%lry, \
+               '%s'%inTiff, '%s'%outTiff]
+
+    process = Popen(cmdProj, stdout=PIPE, shell=False)
+    output, err = process.communicate()
+    if process.returncode != 0:
+        raise RuntimeError("%r failed, status code %s stdout %r stderr %r" % \
+                            (cmdProj, process.returncode, output, err))
+
 def main():
     
     """
     This script examine a default dem file or 
     a user specified dem file
     download data for the area it covered from daymet
-    Usage: python process_dem.py [path to dem file] [start year]\
-                  [end year] [opt1 opt2 ...]
     """
 
     # Default parameters
@@ -95,8 +125,7 @@ def main():
     startYr = 2013
     endYr = 2013
     
-    supportedParam = ['tmin', 'tmax', 'vp', 'prcp', \
-                      'srad', 'swe', 'dayl'];
+    supportedParam = ['tmin', 'tmax', 'prcp'];
     
     # allocate user specified parameters
     if len(sys.argv) == 2:
@@ -105,7 +134,7 @@ def main():
             sys.exit(1)
         else:
             inputTiff = sys.argv[1]
-    elif len(sys.argv) == 4:
+    elif len(sys.argv) >= 4:
         try:
             startYr = int(sys.argv[2])
             endYr = int(sys.argv[3])
@@ -113,16 +142,19 @@ def main():
             print "Invalid year parameters"
             sys.exit(1)
         
-        if endYr < StartYr or endYr > 2013 or StartYr < 1980:
+        if endYr < startYr or endYr > 2013 or startYr < 1980:
             print "Invalid year parameters:[1980 - 2013]"
             sys.exit(1)
-    elif len(sys.argv) > 4:
-        for opt in sys.argv[4:]:
-            if opt not in supportedParam:
-                print "Invalid measurement parameters"
-                sys.exit(1)
-
-        params = sys.argv[4:]
+        if len(sys.argv) > 4:
+            for opt in sys.argv[4:]:
+                if opt == 'all':
+                    params = supportedParam
+                    break
+                elif opt not in supportedParam:
+                    print "Invalid measurement parameters"
+                    sys.exit(1)
+            if params != supportedParam: 
+                params = sys.argv[4:]
 
     # Parse dem file
     demParser = TiffParser()
@@ -131,14 +163,30 @@ def main():
     # get coordinates
     coords = demParser.getDecimalCoords()
     
+    # get projection coords
+    projs = demParser.getProjCoords()
+     
     # get converted name
     tiffName = demParser.getName()
-
-    #print coords   
+    print endYr, startYr
+    # download daymet data   
     for opt in params:
-        getDaymetData(tiffName, coords[0][0], coords[0][1], coords[1][0], coords[1][1], \
+        getDaymetData(tiffName, coords[1][0], coords[1][1], coords[0][0], coords[0][1], \
                       startYr, endYr, opt)
+    print projs
+    print coords
+    projDem('na_dem.tif', projs[1][0], projs[1][1], projs[0][0], projs[0][1],\
+                  tiffName + '_dem.tif')
+    """ 
+    # Clear netcaf data
+    cmdClear = ['rm', '*.nc']
 
+    process = Popen(cmdClear, stdout=PIPE, shell=False)
+    output, err = process.communicate()
+    if process.returncode != 0:
+        raise RuntimeError("%r failed, status code %s stdout %r stderr %r" % \
+                          (cmdClear, process.returncode, output, err))
+    """
 if __name__ == '__main__':
     
     main()
