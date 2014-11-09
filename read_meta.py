@@ -5,7 +5,8 @@ from glob import glob
 import sys
 import decimal
 import ConfigParser
-from tiffParser import TiffParser
+from tiffparser import TiffParser
+import math
 
 def driver(): 
 	"""
@@ -249,8 +250,12 @@ def window_daymet():
 	else:
 		print '\tDaymet DEM detected. Processing.'
 
-	command = ['gdal_translate', '-projwin', coords[1][0], coords[1][1], coords[0][0], coords[0][1], 
-		'na_dem.tif', 'na_dem.part.tif']
+	# Round to the outside edges of overlapping Daymet tiles
+	ul = [str(math.floor(decimal.Decimal(coords[1][0]) / 1000) * 1000), str(math.ceil(decimal.Decimal(coords[1][1]) / 1000) * 1000)]
+	lr = [str(math.ceil(decimal.Decimal(coords[0][0]) / 1000) * 1000), str(math.floor(decimal.Decimal(coords[0][1]) / 1000) * 1000)]
+
+	# Build command
+	command = ['gdal_translate', '-projwin', ul[0], ul[1], lr[0], lr[1], 'na_dem.tif', 'na_dem.part.tif']
 
 	print '\tPartitioning Daymet....'
 
