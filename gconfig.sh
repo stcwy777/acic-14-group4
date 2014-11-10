@@ -2,7 +2,7 @@
 cd
 mkdir grassdata
 cd grasssdata
-mkdir masloc
+mkdir southern_sierra
 cd masloc
 mkdir PERMANENT
 cd PERMANENT
