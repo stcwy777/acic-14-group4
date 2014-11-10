@@ -1,9 +1,9 @@
 #!/bin/bash
 cd
 mkdir grassdata
-cd grasssdata
+cd ${HOME}/grassdata
 mkdir southern_sierra
-cd masloc
+cd southern_sierra
 mkdir PERMANENT
 cd PERMANENT
 echo "proj:       99" > DEFAULT_WIND
@@ -28,6 +28,6 @@ cp DEFAULT_WIND WIND
 cd
 #WIND and DEFAULT_WIND
 echo "GISDBASE: ${HOME}/grassdata" >${HOME}/.grassrc
-echo "LOCATION_NAME: masloc" >> ${HOME}/.grassrc
+echo "LOCATION_NAME: southern_sierra" >> ${HOME}/.grassrc
 echo "MAPSET: PERMANENT" >> ${HOME}/.grassrc
 echo "GRASS_GUI: text" >> ${HOME}/.grassrc
