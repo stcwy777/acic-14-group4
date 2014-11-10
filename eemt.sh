@@ -9,6 +9,8 @@ r.in.gdal input=$3 output=tmax
 r.in.gdal input=$4 output=twi
 r.in.gdal input=$5 output=prcp
 r.in.gdal input=$6 output=dem_1km
+#set region
+g.region rast=dem_10m
 #run model
 r.slope.aspect elevation=dem_10m slope=slope aspect=aspect
 r.sun -s elevin=dem_10m aspin=aspect slopein=slope day="1" step="0.05" dist="1" insol_time=hours_sun glob_rad=total_sun
@@ -17,7 +19,7 @@ r.sun elevin=dem_10m aspin=zeros slopein=zeros day="1" step="0.05" dist="1" glob
 r.mapcalc "S_i=total_sun/flat_total_sun"
 r.mapcalc "a_i=twi/((max(twi)+min(twi))/2)"
 r.mapcalc "c_w=4185.5"
-r.mapcalc "NPP=0"
+#r.mapcalc "NPP=0"
 r.mapcalc "h_bio=22*10^6"
 #loop over days on temp
 for((t=1;t<=365;t++))
@@ -40,7 +42,9 @@ r.mapcalc "tmax_topo_${t}=tmax_loc_${t}*(S_i-(1/S_i))"
 #r.mapcalc "AET=prcp*(1+PET/prcp(1(PET/prcp)2.63)(1/2.63))"
 r.mapcalc "DT_${t}=((tmax_topo_${t}+tmin_topo_${t})/2)-273.15"
 r.mapcalc "F_${t}=a_i*prcp.${t}"
-r.mapcalc "EEMT_${t}=F_${t}*c_w*DT_${t}+NPP*h_bio"
+r.mapcalc "npp_trad_${t}=3000*(1+exp(1.315-0.119*(tmax_loc_${t}+tmin_loc_${t})/2)^-1)"
+r.mapcalc "NPP_${t}=npp_trad_${t}"
+r.mapcalc "EEMT_${t}=F_${t}*c_w*DT_${t}+NPP_${t}*h_bio"
 #output
 g.region rast=EEMT_${t}
 r.out.gdal -c createopt="TFW=YES,COMPRESS=LZW" input=EEMT_${t} output=$eemt_tif
