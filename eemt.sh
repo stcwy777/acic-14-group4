@@ -23,13 +23,13 @@ tmincount=`g.mlist type=rast pattern="tmin.*"|wc -l`
 tmaxcount=`g.mlist type=rast pattern="tmax.*"|wc -l`
 prcpcount=`g.mlist type=rast pattern="prcp.*"|wc -l`
 iter=1
-if [ $tmincount -lt $tmaxcount]
+if [ $tmincount -lt $tmaxcount ]
 then
 iter=$tmincount
 else
 iter=$tmaxcount
 fi
-if [ $iter -lt $prcpcount]
+if [ $iter -lt $prcpcount ]
 then
 iter=$prcpcount
 fi
@@ -49,7 +49,7 @@ r.mapcalc "h_bio=22*10^6"
 for((t=1;t<=365;t++))
 do
 day=$(($t*$interval))
-echo "t=${t}\tday=${day}\n"
+echo "t=${t}:day=${day}."
 eemt_tif="eemt_${t}.tif"
 r.sun -s elevin=dem_10m aspin=aspect slopein=slope day="${day}" step="${stepsize}" dist="1" insol_time=hours_sun_${t} glob_rad=total_sun_${t}
 r.sun elevin=dem_10m aspin=zeros slopein=zeros day="${day}" step="${stepsize}" dist="1" glob_rad=flat_total_sun_${t}
