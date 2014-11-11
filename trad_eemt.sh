@@ -22,10 +22,26 @@ while getopts ":i:o:p:s:e:" o ; do
 		# i = Input directory
 		i)
 			INPUT_DIR=${OPTARG}
+			
+			# Check that it is a valid directory 
+			if [ ! -d INPUT_DIR ] ; then
+				echo $'\nInvalid input directory. '
+				echo "$INPUT_DIR does not exist or is inaccessible."
+				echo
+				exit 1
+			fi
 			;;
 		# o - Output directory
 		o)
 			OUTPUT_DIR=${OPTARG}
+
+			# Check that it is a valid directory 
+			if [ ! -d OUTPUT_DIR ] ; then
+				echo $'\nInvalid output directory. '
+				echo "$OUTPUT_DIR does not exist or is inaccessible."
+				echo
+				exit 1
+			fi
 			;;
 		# p - Makeflow project name
 		p)
@@ -147,7 +163,6 @@ if [ $? -ne 0 ] ; then
 fi
 
 # Download Daymet Information
-
 python process_dem.py output.mean.converted.tif $START_YEAR $END_YEAR tmin tmax prcp
 
 # If process_dem.py failed, don't continue executing
@@ -161,5 +176,7 @@ fi
 #workflow -T wq -N $PROJ_NAME 
 
 # Finished creating model. Organize data.
+echo $'\nOrganizing output....\n'
 
-# Remove temporary files
+cd $OUTPUT_DIR
+# Remove unnecessary files

@@ -32,8 +32,8 @@ def driver():
 	# Then remove the old archives. 
 
 	print '\nExtracting archived DEMs from Open Topography....\n'
-	path = os.path.join(os.getcwd(), '*.tar.gz')
-	extract_dems(glob(path))
+	path = ['TWI.tar.gz', 'dems.tar.gz']
+	extract_dems(path)
 	
 	# Need to merge subfiles for each DEM output into a single TIFF
 	# And remove the now unneeded partial DEMs
@@ -97,6 +97,7 @@ def extract_dems(path):
 		else:
 			# os.remove(archive)
 			print '\tFinished extracting contents of %s. ' % archive
+		
 		# Remove the filename for next iteration
 		command.remove(archive)
 
