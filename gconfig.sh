@@ -1,5 +1,8 @@
 #!/bin/bash
-cd
+if [ -d ${HOME}/grassdata ]; then
+rm -rf "${HOME}/grassdata"
+fi
+cd ${HOME}
 mkdir grassdata
 cd ${HOME}/grassdata
 mkdir southern_sierra
@@ -27,6 +30,9 @@ echo "t-b resol:  1" >> DEFAULT_WIND
 cp DEFAULT_WIND WIND
 cd
 #WIND and DEFAULT_WIND
+if [ -e ${HOME}/.grassrc ]; then
+rm -f ${HOME}/.grassrc
+fi
 echo "GISDBASE: ${HOME}/grassdata" >${HOME}/.grassrc
 echo "LOCATION_NAME: southern_sierra" >> ${HOME}/.grassrc
 echo "MAPSET: PERMANENT" >> ${HOME}/.grassrc
