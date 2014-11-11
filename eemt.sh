@@ -54,7 +54,7 @@ r.mapcalc "c_w = 4185.5"
 r.mapcalc "h_bio = 22*10^6"
 echo "Elapsed time: $(($(date +%s)-$starttime))"
 #loop over days on temp
-for((t=1;t<=365;t++))
+for((t=1;t<=$iter;t++))
 do
 day=$(($t*$interval))
 echo "t=${t}:day=${day}."
