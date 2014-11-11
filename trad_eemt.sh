@@ -6,8 +6,9 @@
 # the input and output directories default to the current working directory. 
 # The Makeflow project name defaults to trad_eemt. 
 
-# Define default values for variables
 clear 
+
+# Define default values for variables
 
 CUR_YEAR=$(date +%Y)
 INPUT_DIR=./
@@ -22,7 +23,7 @@ while getopts ":i:o:p:s:e:" o ; do
 		# i = Input directory
 		i)
 			INPUT_DIR=${OPTARG}
-			
+
 			# Check that it is a valid directory 
 			if [ ! -d INPUT_DIR ] ; then
 				echo $'\nInvalid input directory. '
@@ -152,8 +153,10 @@ echo
 wait
 # Finished reading the command line input
 
-# Process inputs to prepare for parallel commands
+# Initialize iCommands for downloading
+iinit
 
+# Process inputs to prepare for parallel commands
 python read_meta.py $INPUT_DIR
 
 # If read_meta.py failed, don't continue executing
