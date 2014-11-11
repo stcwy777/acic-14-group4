@@ -2,6 +2,7 @@
 #conf
 stepsize=0.5
 interval=1
+starttime=$(date +%s)
 #set up envvar for UAHPC only
 export GISBASE=/gsfs1/xdisk/nirav/grass/grass-6.4.4
 export PATH="$GISBASE/bin:$GISBASE/scripts:$PATH"
@@ -14,11 +15,17 @@ g.proj -c proj4="+proj=lcc +lat_1=25 +lat_2=60 +lat_0=42.5 +lon_0=-100 +x_0=0 +y
 #input
 g.mremove -f "*"
 r.in.gdal input=$1 output=dem_10m
+echo "Elapsed time: $(($(date +%s)-$starttime))"
 r.in.gdal input=$2 output=tmin
+echo "Elapsed time: $(($(date +%s)-$starttime))"
 r.in.gdal input=$3 output=tmax
+echo "Elapsed time: $(($(date +%s)-$starttime))"
 r.in.gdal input=$4 output=twi
+echo "Elapsed time: $(($(date +%s)-$starttime))"
 r.in.gdal input=$5 output=prcp
+echo "Elapsed time: $(($(date +%s)-$starttime))"
 r.in.gdal input=$6 output=dem_1km
+echo "Elapsed time: $(($(date +%s)-$starttime))"
 tmincount=`g.mlist type=rast pattern="tmin.*"|wc -l`
 tmaxcount=`g.mlist type=rast pattern="tmax.*"|wc -l`
 prcpcount=`g.mlist type=rast pattern="prcp.*"|wc -l`
@@ -45,6 +52,7 @@ r.mapcalc "a_i=twi/((max(twi)+min(twi))/2)"
 r.mapcalc "c_w=4185.5"
 #r.mapcalc "NPP=0"
 r.mapcalc "h_bio=22*10^6"
+echo "Elapsed time: $(($(date +%s)-$starttime))"
 #loop over days on temp
 for((t=1;t<=365;t++))
 do
@@ -52,7 +60,9 @@ day=$(($t*$interval))
 echo "t=${t}:day=${day}."
 eemt_tif="eemt_${t}.tif"
 r.sun -s elevin=dem_10m aspin=aspect slopein=slope day="${day}" step="${stepsize}" dist="1" insol_time=hours_sun_${t} glob_rad=total_sun_${t}
+echo "Elapsed time: $(($(date +%s)-$starttime))"
 r.sun elevin=dem_10m aspin=zeros slopein=zeros day="${day}" step="${stepsize}" dist="1" glob_rad=flat_total_sun_${t}
+echo "Elapsed time: $(($(date +%s)-$starttime))"
 r.mapcalc "S_i_${t}=total_sun_${t}/flat_total_sun_${t}"
 r.mapcalc "tmin_loc_${t}=tmin.${t}-0.00649*(dem_10m-dem_1km)"
 r.mapcalc "tmax_loc_${t}=tmax.${t}-0.00649*(dem_10m-dem_1km)"
@@ -77,5 +87,6 @@ r.mapcalc "EEMT_${t}=F_${t}*c_w*DT_${t}+NPP_${t}*h_bio"
 #output
 g.region rast=EEMT_${t}
 r.out.gdal -c createopt="TFW=YES,COMPRESS=LZW" input=EEMT_${t} output=$eemt_tif
+echo "Elapsed time: $(($(date +%s)-$starttime))"
 done
 g.mremove -f "*"
