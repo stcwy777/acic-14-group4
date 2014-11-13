@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # Bash script that will create tasks for Makeflow to create a 
-# traditional EEMT model. Takes an input directory, output directory,
-# and a project name if specified. If none of the arguments are given, 
-# the input and output directories default to the current working directory. 
-# The Makeflow project name defaults to trad_eemt. 
+# traditional EEMT model. Takes an input directory, output 
+# directory, and a project name if specified. If none of the 
+# arguments are given, the input and output directories default to 
+# the current working directory. The Makeflow project name defaults 
+# to trad_eemt. 
 
 # Clear the screen
 clear 
@@ -134,7 +135,7 @@ while getopts ":i:o:p:s:e:d:" o ; do
 			echo
 
 			echo "-d 	Specifies the location of the Daymet DEM. The filename must be na_dem.tif. "
-			
+
 
 			exit 1	
 	esac
