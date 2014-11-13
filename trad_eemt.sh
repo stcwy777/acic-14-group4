@@ -6,6 +6,7 @@
 # the input and output directories default to the current working directory. 
 # The Makeflow project name defaults to trad_eemt. 
 
+# Clear the screen
 clear 
 
 # Define default values for variables
@@ -14,11 +15,11 @@ CUR_YEAR=$(date +%Y)
 INPUT_DIR=./
 OUTPUT_DIR=./
 PROJ_NAME="trad_eemt"
-END_YEAR=$(($CUR_YEAR-1))
+END_YEAR=$(($CUR_YEAR - 2))
 START_YEAR=1980
 
 # Process arguments
-while getopts ":i:o:p:s:e:" o ; do
+while getopts ":i:o:p:s:e:d:" o ; do
 	case "${o}" in 
 		# i = Input directory
 		i)
@@ -32,6 +33,7 @@ while getopts ":i:o:p:s:e:" o ; do
 				exit 1
 			fi
 			;;
+
 		# o - Output directory
 		o)
 			OUTPUT_DIR=${OPTARG}
@@ -44,10 +46,12 @@ while getopts ":i:o:p:s:e:" o ; do
 				exit 1
 			fi
 			;;
+
 		# p - Makeflow project name
 		p)
 			PROJ_NAME=${OPTARG}
 			;;
+
 		# s - Start year
 		s)
 			START_YEAR=${OPTARG}
@@ -83,7 +87,7 @@ while getopts ":i:o:p:s:e:" o ; do
 				# Check upper bounds 
 				if [ "$END_YEAR" -gt "$(($CUR_YEAR - 1 ))" ] ; then
 					END_YEAR=$(($CUR_YEAR - 1 ))
-					echo "The starting year needs to be at most $(($CUR_YEAR - 1 )). Defaulting to $(($CUR_YEAR - 1 ))."
+					echo "The starting year needs to be at most $(($CUR_YEAR - 2 )). Defaulting to $(($CUR_YEAR - 2 ))."
 				
 				# Check lower bounds
 				elif [ "$END_YEAR" -lt 1980 ] ; then
@@ -98,30 +102,39 @@ while getopts ":i:o:p:s:e:" o ; do
 			fi
 			;;
 			
+		# d - Location of Daymet DEM 
+		d) 
+			# Check that the file exists
+			if [ -e ${OPTARG} ] ; then
+				# Save it 
+				DAYMET_DEM=${OPTARG}
+			fi
+
+			;;
+
 		# Unknown entry, print usage and exit with a non-zero status
 		*)
-			echo "Usage: trad_eemt.sh [-i input_directory] [-o output_directory] "
-			echo $' 	[-p makeflow_project] [-s starting year] [-e ending year]\n'
+			echo "Usage: trad_eemt.sh [-i input directory] [-o output directory] [-p project name]"
+			echo "	[-s starting year] [-e ending year] [-d Daymet DEM]"
+			echo
 			
-			echo "-i 	Specifies the directory that contains the Open Topography data. "
-			echo "   	files can be stored as a .tif or still be archived as .tar.gz. The"
-			echo $'  	metadata file needs to be included. Defaults to current directory.\n'
+			echo "-i 	Specifies the directory that contains the Open Topography data. Files can be stored as a .tif or still be archived as .tar.gz. The metadata file needs to be included. Defaults to current directory."
+			echo
 
-			echo "-o 	Specifies the directory where the completed transfer model should "
-			echo $'   	be stored. Defaults to the current directory.\n'
+			echo "-o 	Specifies the directory where the completed transfer model should be stored. Defaults to the current directory."
+			echo
 			
-			echo "-p 	Specifies the project name used by makeflow. Workers will need the "
-			echo "   	project name to connect to the makeflow process. Defaults to "
-			echo $'   	trad_eemt.\n'
+			echo "-p 	Specifies the project name used by makeflow. Workers will need the project name to connect to the makeflow process. Defaults to trad_eemt."
+			echo
 
-			echo "-s 	Specifies the starting year for generating the EEMT model. Dayment "
-			echo "   	data starts in 1980. If a year is not specified, or the year is too "
-			echo $'   	early, 1980 is used. \n'
+			echo "-s 	Specifies the starting year for generating the EEMT model. Dayment data starts in 1980. If a year is not specified, or the year is too early, 1980 is used."
+			echo			
 
-			echo "-e 	Specifies the end year for generating the EEMT model. Yearly Daymet "
-			echo "   	data is posted in the following June. If a year is not specified or "
-			echo "   	the year is in the current year or later, it will default to last "
-			echo $'   	year.\n'
+			echo "-e 	Specifies the end year for generating the EEMT model. Yearly Daymet data is posted in the following June. If a year is not specified or the year is in the current year or later, it will default to last year."
+			echo
+
+			echo "-d 	Specifies the location of the Daymet DEM. The filename must be na_dem.tif. "
+			
 
 			exit 1	
 	esac
@@ -146,11 +159,21 @@ echo "Input Directory 	= $INPUT_DIR"
 echo "Output Directory 	= $OUTPUT_DIR"
 echo "Project Name 		= $PROJ_NAME"
 
+# If the DEM isn't specified, tell the user it will be downloaded
+if [ -z $DAYMET_DEM ] ; then
+	echo "Daymet DEM will be downloaded from iPlant."
+
+# Otherwise, show the user what they specified
+else
+	echo "Daymet DEM 		= $DAYMET_DEM"
+fi
+
 echo
 read -p "Hit [Ctrl]-[C] to abort, or any key to start processing...."
 echo
 
 wait
+
 # Finished reading the command line input
 
 # Initialize iCommands for downloading
@@ -173,6 +196,7 @@ if [ $? -ne 0 ] ; then
 	echo $'\nFailed downloading the Daymet data. Please check errors. Aborting....\n'
 	exit 1
 fi
+
 # Create the Makeflow/Work Queue tasks for Weifeng here
 
 # Start makeflow 
@@ -181,5 +205,4 @@ fi
 # Finished creating model. Organize data.
 echo $'\nOrganizing output....\n'
 
-cd $OUTPUT_DIR
 # Remove unnecessary files
