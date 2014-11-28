@@ -30,7 +30,25 @@
       <section id="main_content">
         <h3>Welcome to the Group 4 website.</h3>
 
-<p> The current version is <h4>Pre 1.0 Release</h4>. </p>
+<p> The current version is: </p>
+<h4>Pre 1.0</h4> 
+
+<p> The current development goal is to finish the simple EEMT model generation script. As of right now, each member is still working on their respective responsibilities. </p>
+
+<h3> Development Goals </h3>
+
+
+|Version|Added Features|Contributor|Notes|Status|
+|-------+--------------+-----------+-----+------+
+|1.0|Single script ingests data and starts makeflow for workers|All| Basic result for final product |In Progress|
+| |Driving script| Brayden| Calls each subfunction at the appopriate time to process data and start parallelization.|In Progress|
+||Daymet Ingestion| Yun| Downloads the appropriate information from Daymet for the specified years and coordinates| In Progress|
+|| R.Sun | Weifeng| Calculates all of the R.Sun values for the dataset. Will be used to generate final results. | In Progress|
+|| Trad EEMT Calculations| Weifeng| Upscales the various climate datasets, then combines them with the DEMs to calculate the Traditional EEMT model | In Progress|
+|| Parallelize Operations | Alyssa | Creates all of the tasks required to generate each input file, upscale the dataset, and calculate the final model. | In Progress|
+||||||
+|1.1|Data Visualization| TBD| Want to convert the results to Google Earth compatible files to support visualization. | Planned| 
+|1.2|Graphical Interface| TBD| Will provide a simple graphical front end to make it simpler to use. | Planned |
 
 <h3>
 <a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
