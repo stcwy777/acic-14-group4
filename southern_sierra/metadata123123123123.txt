@@ -1,0 +1,59 @@
+Dataset Information:
+
+Dataset Name: Southern Sierra Nevada Critical Zone Observatory: Snow Off(SSCZO_Aug10)
+
+Dataset Acknowledgement: 
+Please cite this data release as: Anderson, S.P., Qinghua, G., and Parrish, E.G., 2012, Snow-on and snow-off LiDAR point cloud data and digital elevation models for study of topography, snow, ecosystems and environmental change at Southern Sierra Critical Zone Observatory, California: Southern Sierra CZO, University of California at Merced , digital media.   Please cite this data release as: Qinghua, Guo. Roger Bales, 2012, Snow-on and snow-off LiDAR point cloud data and digital elevation models for study of topography, snow, ecosystems and environmental change at Southern Sierra Critical Zone Observatory, California: Southern Sierra CZO, University of California at Merced, digital media. And the funding sources: National Science Funding: EAR-0922307.  Please use either snow on/off or leaf on/off for all sites. For the credit, use my name, and PIs of the site (e.g. Qinghua, Roger Bales), check the CZO website for the name of PIs (there are one site which has two PIs). For leave on/off site, please use this title: Leaf-on and leaf-off LiDAR point cloud data and digital elevation models for study of hydrologic, geomorphologic, and geochemical processes at XXXX (need to fill in the specific site name) Critical Zone Observatory.  LiDAR data are collected by the National Center for Airborne Laser Mapping (NCALM - http://www.ncalm.org), with project director Qinghua Guo, funded by National Science Foundation (EAR-0922307). .
+
+Data Access Acknowledgement: This material is based on [data, processing] services provided by the OpenTopography Facility with support from the National Science Foundation under NSF Award Numbers 0930731 & 0930643
+
+Horizontal Coordinates: UTM z11N NAD83 (CORS96) [EPSG: 26911]
+Vertical Coordinates: NAVD88 (Geoid 03) [EPSG: 5703]
+
+Job Description:
+	User:bstreete@email.arizona.edu
+	Job ID: 1414366930965128995917
+	Title: 
+	Description:
+
+Job Processing Result:
+	Submission Time: 2014-10-26 16:42:11
+	Completion Time: 2014-10-26 16:44:03
+	Duration: 112 seconds
+	Number of Points: 12,470,704
+	Status: Done
+
+Data Selection Coordinates: 
+	Xmin: 320709.974
+	Xmax: 325538.562
+	Ymin: 4101222.513
+	Ymax: 4106868.825
+	Classifications: Ground
+
+Point Cloud Results:
+	Download point cloud data in ASCII format: No
+	Download point cloud data in LAS format: Yes
+	Download point cloud data in LAZ format: No
+
+DEM Generation (Local Gridding):
+	Calculate Zmin grid: No
+	Calculate Zmax grid: No
+	Calculate Zmean grid: Yes
+	Calculate Zidw grid: No
+	Calculate point count grid: No
+	Grid Format: GTiff
+	Resolution: 10 meter
+	Radius: 10 meter
+	Null Fill: 3
+
+DEM Generation (TIN):
+	Calculate TIN: Yes
+	Grid Format: GTiff
+	Resolution: 10
+	Max Triangle Size: 50
+
+Derivative Products:
+	Generate Hillshades & Slopes: none
+
+Visualization:
+	Images & Google Earth KML: No
