@@ -27,8 +27,9 @@ while getopts ":i:o:p:s:e:d:" o ; do
 			INPUT_DIR=${OPTARG}
 
 			# Check that it is a valid directory 
-			if [ ! -d INPUT_DIR ] ; then
-				echo $'\nInvalid input directory. '
+			if [ ! -d "$INPUT_DIR" ] ; then
+				echo
+				echo "Invalid input directory. "
 				echo "$INPUT_DIR does not exist or is inaccessible."
 				echo
 				exit 1
@@ -40,8 +41,9 @@ while getopts ":i:o:p:s:e:d:" o ; do
 			OUTPUT_DIR=${OPTARG}
 
 			# Check that it is a valid directory 
-			if [ ! -d OUTPUT_DIR ] ; then
-				echo $'\nInvalid output directory. '
+			if [ ! -d "$OUTPUT_DIR" ] ; then
+				echo
+				echo "Invalid output directory. "
 				echo "$OUTPUT_DIR does not exist or is inaccessible."
 				echo
 				exit 1
@@ -185,16 +187,20 @@ python read_meta.py $INPUT_DIR
 
 # If read_meta.py failed, don't continue executing
 if [ $? -ne 0 ] ; then
-	echo $'\nFailed processing the inputs. Please check errors. Aborting....\n'
+	echo
+	echo "Failed processing the inputs. Please check errors. Aborting...."
+	echo
 	exit 1
 fi
 
 # Download Daymet Information
-python process_dem.py output.mean.converted.tif $START_YEAR $END_YEAR tmin tmax prcp
+python process_dem.py pit_c.tif $START_YEAR $END_YEAR tmin tmax prcp
 
 # If process_dem.py failed, don't continue executing
 if [ $? -ne 0 ] ; then
-	echo $'\nFailed downloading the Daymet data. Please check errors. Aborting....\n'
+	echo
+	echo "Failed downloading the Daymet data. Please check errors. Aborting...."
+	echo
 	exit 1
 fi
 
@@ -204,6 +210,12 @@ fi
 #workflow -T wq -N $PROJ_NAME 
 
 # Finished creating model. Organize data.
-echo $'\nOrganizing output....\n'
+echo
+echo "Organizing output...."
+echo
 
 # Remove unnecessary files
+
+echo 
+echo "Finished tasks."
+echo
