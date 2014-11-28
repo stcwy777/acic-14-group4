@@ -7,6 +7,7 @@ import decimal
 import ConfigParser
 from tiffparser import TiffParser
 import math
+import tarfile
 
 def driver(): 
 	"""
@@ -22,7 +23,6 @@ def driver():
 			print "Too many arguments passed."
 			print "Usage: %s [directory]" % sys.argv[0]
 			sys.exit(1)
-
 	except OSError:
 		print "Directory not found."
 		print "Usage: %s [directory]" % sys.argv[0]
@@ -32,9 +32,12 @@ def driver():
 	# Then remove the old archives. 
 
 	print '\nExtracting archived DEMs from Open Topography....\n'
-	path = ['TWI.tar.gz', 'dems.tar.gz']
-	extract_dems(path)
+	path = ['TWI.tar.gz', 'pitRemove.tar.gz']
+
+	for archives in path:
+		extract_dems(archives)
 	
+	print
 	# Need to merge subfiles for each DEM output into a single TIFF
 	# And remove the now unneeded partial DEMs
 
@@ -55,12 +58,12 @@ def driver():
 	# path = os.path.join(os.getcwd(), "slpp*.tif")
 	# merge_files(glob(path), 'slope_total.tif')
 
-	# print 'Merging pit remove DEMs....'
-	# # Pit Remove 
-	# path = os.path.join(os.getcwd(), 'felp*.tif')
-	# merge_files(glob(path), 'pit_total.tif')
+	print 'Merging pit remove DEMs....'
+	# Pit Remove 
+	path = os.path.join(os.getcwd(), 'felp*.tif')
+	merge_files(glob(path), 'pit.tif')
 
-	print '\nMerging TWI DEMs....'
+	print 'Merging TWI DEMs....'
 	# Total Wetness Index
 	path = os.path.join(os.getcwd(), 'twip*.tif')
 	merge_files(glob(path), 'twi.tif')
@@ -73,33 +76,52 @@ def driver():
 	# Take the useful information out of the Daymet DEM
 	window_daymet()
 
+	print 'Finished preparing raw inputs.\n'
+
 # End driver() 
 
-def extract_dems(path):
+def extract_dems(archive):
 	"""
-	Extracts all files ending with .tar.gz in the currrent directory. After a successful execution, delete the extracted archive. 
+	Extracts the specified archive file in the currrent directory. 
 	"""
 	
-	for archive in path:
+		# See if the file exists
+	if os.path.exists(archive):
 
-		# Setup command for each file
-		command = ['tar', 'zxf'] 
-		command.append(archive)
+		# Check to see if the archive has already been extracted
+		arch = tarfile.open(archive)
+		for name in arch: 
+			if os.path.exists(str(name.name)):
+				print '\tContents of %s already extracted. Skipping.' % archive
+				
+				return
 
-		process = Popen (command, stdout=PIPE, shell=False)
-		stdout, stderr = process.communicate()
-
-		if process.returncode != 0: 
-			print '\tErrors encountered extracting %s.\n' % archive
-			print stderr
-
-		# Successfully untarred/ungzipped specified archive
+		# Archive not extracted yet
 		else:
-			# os.remove(archive)
-			print '\tFinished extracting contents of %s. ' % archive
-		
-		# Remove the filename for next iteration
-		command.remove(archive)
+			print '\tExtracting %s. ' % archive
+
+			# Setup the extract command with tar
+			command = ['tar', 'zxf'] 
+			command.append(archive)
+
+			process = Popen (command, stdout=PIPE, shell=False)
+			stdout, stderr = process.communicate()
+
+			if process.returncode != 0: 
+				print '\tErrors encountered extracting %s.\n' % archive
+				print stderr
+				sys.exit(1)
+
+			# Successfully untarred/ungzipped specified archive
+			else:
+				print '\tFinished extracting contents of %s. ' % archive
+
+		arch.close()
+
+	# The file doesn't exist in the file system
+	else:
+		print '%s not found in the specified directory. Aborting' % archive
+		sys.exit(1)
 
 # End extract_dems()
 
@@ -108,22 +130,23 @@ def merge_files(path, output):
 	Merges the filenames passed into a single TIFF file with gdalwarp. Assumes that the system running the application has at least 2 GB of available memory. Deletes the individual chunks of the file after creating the single combined TIFF. 
 	"""
 
-	# Create the command to execute
-	command = ['gdalwarp', '-overwrite'] 
-	command.extend(path)
-	command.append(output)
+	if not os.path.exists(output):
+		# Create the command to execute
+		command = ['gdalwarp', '-overwrite'] 
+		command.extend(path)
+		command.append(output)
 
-	# Execute the command
-	process = Popen(command, stdout=PIPE, shell=False)
-	stdout, stderr = process.communicate()
+		# Execute the command
+		process = Popen(command, stdout=PIPE, shell=False)
+		stdout, stderr = process.communicate()
 
-	if process.returncode != 0:
-		print stderr
-	else:
-		# Remove the partitioned files
-		for part in path: 
-			os.remove(part)
-		print 'Finished merging %s.\n' % output
+		if process.returncode != 0:
+			print stderr
+		else:
+			print 'Finished merging %s.\n' % output
+
+	else: 
+		print '%s already merged. Skipping.\n' % output
 		
 # End merge_files()
 
@@ -185,36 +208,41 @@ def convert_opentopo(proj_info):
 			   '-r', 'bilinear', '-of', 'GTiff', '-tr', '10', '-10']
 
 	# Need to execute for each .tif file from OpenTopo
-	path = ['output.mean.tif', 'twi.tif']
+	path = ['pit.tif', 'twi.tif']
 
 	for dem_file in path:
 
 		# Create the output file name
-		dem_output = dem_file[:-4] + '.converted.tif'
+		dem_output = dem_file[:-4] + '_c.tif'
 
-		print "\tCreating %s." % dem_output
+		# Check to see if the file has already been created
+		if not os.path.exists(dem_output):
 
-		# Add the filenames to the end of the list
-		command.append(dem_file)
-		command.append(dem_output)
+			print "\tCreating %s." % dem_output
 
-		# Execute the gdalwarp command
-		process = Popen(command, stdout=PIPE, shell=False)
+			# Add the filenames to the end of the list
+			command.append(dem_file)
+			command.append(dem_output)
 
-		# Check for errors
-		stdout, stderr = process.communicate()
+			# Execute the gdalwarp command
+			process = Popen(command, stdout=PIPE, shell=False)
 
-		if process.returncode != 0:
-			print stderr
+			# Check for errors
+			stdout, stderr = process.communicate()
 
-		# Remove the original file
+			if process.returncode != 0:
+				print stderr
+
+			else:
+				print '\tSuccessfully created %s.\n' % dem_output
+
+			# Remove the filenames for next iteration
+			command.remove(dem_file)
+			command.remove(dem_output)
+
+		# File already warped
 		else:
-			# os.remove(dem_file)
-			print '\tSuccessfully created %s.\n' % dem_output
-
-		# Remove the filenames for next iteration
-		command.remove(dem_file)
-		command.remove(dem_output)
+			print '\t%s detected. Skipping.\n' % dem_output
 
 # End convert_opentopo()
 	
@@ -227,7 +255,7 @@ def window_daymet():
 	print 'Download and convert Daymet DEM.'
 	# Parse dem file
 	demParser = TiffParser()
-	demParser.loadTiff('output.mean.converted.tif')
+	demParser.loadTiff('pit_c.tif')
     
     # get coordinates
 	coords = demParser.getProjCoords()
