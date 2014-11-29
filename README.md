@@ -64,7 +64,7 @@ This script submits Work Queue Workers to the UA HPC cluster through the PBS bat
 
 * -e Disables automatic emails about job submission and completion. By default, emails are sent. 
 * -g Specify a different group to charge for the job submission.
-* -n Sets the number of workers to submit. Default is 12 which is a complete physical node on the HTC system. 
-* -p Sets the project name for the workers to connect to. Default is $USER_eemt.
+* -n Sets the number of workers to submit. Default is 1 worker.
+* -p Sets the project name for the workers to connect to. Default is trad_eemt.
 * -s Sets the job priority to standard. Default priority is windfall. 
 * -w Specifies the expected wall time (in hours) of the calculation. Default is 1 hour. Used to calculate the CPU time as well. 
