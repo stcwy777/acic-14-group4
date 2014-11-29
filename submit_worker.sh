@@ -148,7 +148,6 @@ while [ $INDEX -lt $NODES ] ; do
 	INDEX=$(( $INDEX + 1))
 done
 
-cat $SCRIPT
 rm $SCRIPT
 
 # Check the status of the submission
