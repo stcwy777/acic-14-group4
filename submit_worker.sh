@@ -96,7 +96,7 @@ while getopts ":eg:n:p:sw:" o ; do
 			echo
 			echo $'\t-e\tDisables the email notifications when the job begins and ends (Enabled by default).'
 			echo $'\t-g\tSpecify the group to charge for resource utilization.'
-			echo $'\t-n\tSets the number of nodes to request. Defaults to 12 (One complete physical node).'
+			echo $'\t-n\tSets the number of workers to request. Defaults to 12 (One complete physical node).'
 			echo $'\t-p\tSpecify the project name to connect the worker to. Defaults to $USER_eemt'
 			echo $'\t-s\tSets the priority to standard. Default is windfall.'
 			echo $'\t-w\tSpecify the walltime for the calculations in hours. Defaults to 1 hour.'
@@ -106,21 +106,8 @@ while getopts ":eg:n:p:sw:" o ; do
 done	# End argument reading
 
 # Finish calculating variables
-
-# Determine the Job Type based on requested nodes
-if [ $NODES -eq 1 ] ; then
-	JOB_TYPE="serial"
-	SHARE_NODE="#PBS -l place=pack:shared"
-elif [ $NODES -lt 13 ] ; then
-	JOB_TYPE="small_mpi"
-	SHARE_NODE="#PBS -l place=pack:shared"	
-else
-	JOB_TYPE="large_mpi"
-fi
-
 CPUTIME=$(($WALLTIME * $NODES))
 WALLTIME=$WALLTIME:0:0
-CPUTIME=$CPUTIME:0:0
 
 SCRIPT="qsub_wq_worker_${TIMESTAMP}.pbs"
 
@@ -133,20 +120,18 @@ ${EMAIL}PBS -m bea
 #PBS -M $ADDRESS
 
 #PBS -W group_list=$GROUP
-#PBS -l jobtype=$JOB_TYPE
+#PBS -l jobtype=serial
 #PBS -q $PRIORITY
-
-#PBS -l select=${NODES}:ncpus=1:mem=2gb
+#PBS -l select=1:ncpus=1:mem=2gb
 #PBS -l pvmem=2gb
-$SHARE_NODE
+#PBS -l place=pack:shared
 #PBS -l walltime=$WALLTIME
-#PBS -l cput=$CPUTIME
+#PBS -l cput=$WALLTIME
 
 ### Code to Execute
 cd $PWD
 
 source /usr/share/Modules/init/csh
-module load intel-mpi
 
 date
 work_queue_submit -M $PROJECT
@@ -156,9 +141,15 @@ __EOF__
 ### End of PBS Code
 
 # Change the script to an executable and submit it with qsub
-# chmod 755 $script_name
+chmod 755 $script_name
+INDEX=0
 
-# qsub $SCRIPT
+while [ $INDEX -lt $NODES ] ; do 
+	echo "Submitted worker."
+	# qsub $SCRIPT
+	INDEX=$(( $INDEX + 1))
+done
+
 cat $SCRIPT
 rm $SCRIPT
 
