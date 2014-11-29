@@ -12,7 +12,7 @@
 sudo apt-get update -y
 
 # Install Applications
-sudo apt-get install -y grass-dev coop-computing-tools python-pip git
+sudo apt-get install -y grass-dev coop-computing-tools python-rpy2 git
 
 
 # Get R 3.1+ 
