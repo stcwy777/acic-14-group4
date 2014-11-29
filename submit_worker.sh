@@ -16,7 +16,7 @@ NODES=1
 EMAIL="#"
 WALLTIME=1
 PROJECT=trad_eemt
-TIMESTAMP=$( date +%Y.%m.%d_%T )
+TIMESTAMP=$( date +%T )
 
 # Read and process the arguments
 while getopts ":eg:n:p:sw:" o ; do
@@ -141,7 +141,7 @@ __EOF__
 ### End of PBS Code
 
 # Change the script to an executable and submit it with qsub
-chmod 755 $script_name
+chmod 755 $SCRIPT
 INDEX=0
 
 while [ $INDEX -lt $NODES ] ; do 
