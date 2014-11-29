@@ -14,19 +14,35 @@ def driver():
 	Handles the execution of the program. Changes the working directory, un-archives all of the files in the directory, merges the partitioned TIFs into a single master TIF for each dataset, then converts the TIFs from their current projections to the projection defined by Daymet. 
 	"""
 
-	# Change to passed directory, if applicable
+	# Handle Arguments
 	try:
+		# Change to passed directory, if applicable
 		if len(sys.argv) == 2:
 			os.chdir(sys.argv[1])
 
-		elif len(sys.argv) > 2:
+		# Change to passed directory and test that na_dem exists
+		elif len(sys.argv) == 3: 
+			
+			# Check to see if na_dem path is good
+			if os.path.isfile(os.path.join(sys.argv[2], 'na_dem.tif')):
+				daymet_path = os.path.join(os.getcwd(), sys.argv[2])
+				os.chdir(sys.argv[1])
+			else:
+				print 'Location of na_dem.tif is invalid. Aborting.'
+				sys.exit(1)
+
+		# Otherwise
+		else:
 			print "Too many arguments passed."
 			print "Usage: %s [directory]" % sys.argv[0]
 			sys.exit(1)
+
 	except OSError:
 		print "Directory not found."
 		print "Usage: %s [directory]" % sys.argv[0]
 		sys.exit(1)
+
+	input_path = os.getcwd()
 
 	# Untar all of the files in the working directory before merging 
 	# Then remove the old archives. 
@@ -74,7 +90,16 @@ def driver():
 	read_meta() 
 
 	# Take the useful information out of the Daymet DEM
-	window_daymet()
+
+	# Update the current directory to include
+	try:
+		os.chdir(daymet_path)
+
+	except OSError:
+		print 'Unable to change to directory containing na_dem.tif. Aborting.'
+		sys.exit(1)
+
+	window_daymet(input_path)
 
 	print 'Finished preparing raw inputs.\n'
 
@@ -246,7 +271,7 @@ def convert_opentopo(proj_info):
 
 # End convert_opentopo()
 	
-def window_daymet():
+def window_daymet(output):
 	"""
 	Shrinks the Daymet DEM to include only relevant data to the Open
 	Topography data set. 
@@ -255,7 +280,7 @@ def window_daymet():
 	print 'Download and convert Daymet DEM.'
 	# Parse dem file
 	demParser = TiffParser()
-	demParser.loadTiff('pit_c.tif')
+	demParser.loadTiff(os.path.join(output,'pit_c.tif'))
     
     # get coordinates
 	coords = demParser.getProjCoords()
@@ -284,7 +309,7 @@ def window_daymet():
 	lr = [str(math.ceil(decimal.Decimal(coords[0][0]) / 1000) * 1000), str(math.floor(decimal.Decimal(coords[0][1]) / 1000) * 1000)]
 
 	# Build command
-	command = ['gdal_translate', '-projwin', ul[0], ul[1], lr[0], lr[1], 'na_dem.tif', 'na_dem.part.tif']
+	command = ['gdal_translate', '-projwin', ul[0], ul[1], lr[0], lr[1], 'na_dem.tif', os.path.join(output, 'na_dem.part.tif')]
 
 	print '\tPartitioning Daymet....'
 
@@ -301,4 +326,5 @@ def window_daymet():
 
 # End window_daymet()
 
-driver()
+if __name__ == '__main__':
+	sys.exit(driver())
