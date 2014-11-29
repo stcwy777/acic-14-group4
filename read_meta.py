@@ -93,7 +93,7 @@ def driver():
 
 	# Update the current directory to include
 	try:
-		os.chdir(daymet_path)
+		os.chdir(inpu_path)
 
 	except OSError:
 		print 'Unable to change to directory containing na_dem.tif. Aborting.'
