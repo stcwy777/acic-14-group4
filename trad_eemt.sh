@@ -194,7 +194,7 @@ if [ $? -ne 0 ] ; then
 fi
 
 # Download Daymet Information
-python process_dem.py pit_c.tif $START_YEAR $END_YEAR tmin tmax prcp
+python process_dem.py ${INPUT_DIR}pit_c.tif $START_YEAR $END_YEAR tmin tmax prcp
 
 # If process_dem.py failed, don't continue executing
 if [ $? -ne 0 ] ; then
