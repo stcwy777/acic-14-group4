@@ -16,7 +16,6 @@ NODES=1
 EMAIL="#"
 WALLTIME=1
 PROJECT=trad_eemt
-TIMESTAMP=$( date +%T )
 
 # Read and process the arguments
 while getopts ":eg:n:p:sw:" o ; do
@@ -109,7 +108,7 @@ done	# End argument reading
 CPUTIME=$(($WALLTIME * $NODES))
 WALLTIME=$WALLTIME:0:0
 
-SCRIPT="qsub_wq_worker_${TIMESTAMP}.pbs"
+SCRIPT="qsub_wq_worker_$USER.pbs"
 
 ### Start of PBS Code
 cat > "${SCRIPT}" << __EOF__
