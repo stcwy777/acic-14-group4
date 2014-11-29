@@ -12,7 +12,7 @@ GROUP="nirav"
 
 # These variables are modified by passed arguments
 PRIORITY="windfall"
-NODES=12
+NODES=1
 EMAIL="#"
 WALLTIME=1
 PROJECT=${USER}_eemt
@@ -96,7 +96,7 @@ while getopts ":eg:n:p:sw:" o ; do
 			echo
 			echo $'\t-e\tDisables the email notifications when the job begins and ends (Enabled by default).'
 			echo $'\t-g\tSpecify the group to charge for resource utilization.'
-			echo $'\t-n\tSets the number of workers to request. Defaults to 12 (One complete physical node).'
+			echo $'\t-n\tSets the number of workers to request. Defaults to 1.'
 			echo $'\t-p\tSpecify the project name to connect the worker to. Defaults to $USER_eemt'
 			echo $'\t-s\tSets the priority to standard. Default is windfall.'
 			echo $'\t-w\tSpecify the walltime for the calculations in hours. Defaults to 1 hour.'
