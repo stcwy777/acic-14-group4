@@ -145,8 +145,7 @@ chmod 755 $script_name
 INDEX=0
 
 while [ $INDEX -lt $NODES ] ; do 
-	echo "Submitted worker."
-	# qsub $SCRIPT
+	qsub $SCRIPT
 	INDEX=$(( $INDEX + 1))
 done
 
@@ -154,4 +153,4 @@ cat $SCRIPT
 rm $SCRIPT
 
 # Check the status of the submission
-# qstat -u $USER
+qstat -u $USER
