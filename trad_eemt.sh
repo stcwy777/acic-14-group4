@@ -162,13 +162,13 @@ echo "Input Directory 	= $INPUT_DIR"
 echo "Output Directory 	= $OUTPUT_DIR"
 echo "Project Name 		= $PROJ_NAME"
 
-# If the DEM isn't specified, tell the user it will be downloaded
-if [ -z $DAYMET_DEM ] ; then
+# If the DEM isn't specified, and isn't found in the specified directory, download it
+if [ ! -e "${INPUT_DIR}${DAYMET_DEM}na_dem.tif" ] ; then
 	echo "Daymet DEM will be downloaded from iPlant."
 
 # Otherwise, show the user what they specified
 else
-	echo "Daymet DEM 		= $DAYMET_DEM"
+	echo "Daymet DEM 		= ${INPUT_DIR}${DAYMET_DEM}na_dem.tif"
 fi
 
 echo
@@ -183,7 +183,7 @@ wait
 iinit
 
 # Process inputs to prepare for parallel commands
-python read_meta.py $INPUT_DIR
+python read_meta.py $INPUT_DIR $DAYMET_DEM
 
 # If read_meta.py failed, don't continue executing
 if [ $? -ne 0 ] ; then
