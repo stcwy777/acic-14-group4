@@ -57,7 +57,7 @@ eemt.sh
 Name of Merge Script 
 ---
 
-submit_worker.sh  **STILL TESTING** 
+submit_worker.sh
 --- 
 
 This script submits Work Queue Workers to the UA HPC cluster through the PBS batch system. There are two lines that must be configured by the user before execution. The ADDRESS variable configures the email address to send job notifications to. The GROUP variable configures the group that is charged for the job submission and processing. It takes a number of optional arguments. 
