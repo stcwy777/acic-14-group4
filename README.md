@@ -62,9 +62,9 @@ submit_worker.sh  **STILL TESTING**
 
 This script submits Work Queue Workers to the UA HPC cluster through the PBS batch system. There are two lines that must be configured by the user before execution. The ADDRESS variable configures the email address to send job notifications to. The GROUP variable configures the group that is charged for the job submission and processing. It takes a number of optional arguments. 
 
-*-e Disables automatic emails about job submission and completion. By default, emails are sent. 
-*-g Specify a different group to charge for the job submission.
-*-n Sets the number of workers to submit. Default is 12 which is a complete physical node on the HTC system. 
-*-p Sets the project name for the workers to connect to. Default is $USER_eemt.
-*-s Sets the job priority to standard. Default priority is windfall. 
-*-w Specifies the expected wall time (in hours) of the calculation. Default is 1 hour. Used to calculate the CPU time as well. 
+* -e Disables automatic emails about job submission and completion. By default, emails are sent. 
+* -g Specify a different group to charge for the job submission.
+* -n Sets the number of workers to submit. Default is 12 which is a complete physical node on the HTC system. 
+* -p Sets the project name for the workers to connect to. Default is $USER_eemt.
+* -s Sets the job priority to standard. Default priority is windfall. 
+* -w Specifies the expected wall time (in hours) of the calculation. Default is 1 hour. Used to calculate the CPU time as well. 
