@@ -120,7 +120,7 @@ def main():
     """
 
     # Default parameters
-    inputTiff = 'output.mean.converted.tif'
+    inputTiff = 'pit_c.tif'
     params = ['tmin']
     startYr = 2013
     endYr = 2013
@@ -136,6 +136,12 @@ def main():
             inputTiff = sys.argv[1]
     elif len(sys.argv) >= 4:
         try:
+            if not sys.argv[1].endswith('.tif') or not os.path.exists(sys.argv[1]):
+                print "File not exist or wrong type"
+                sys.exit(1)
+            else:
+                inputTiff = sys.argv[1]
+
             startYr = int(sys.argv[2])
             endYr = int(sys.argv[3])
         except ValueError:
@@ -146,6 +152,23 @@ def main():
             print "Invalid year parameters:[1980 - 2013]"
             sys.exit(1)
         if len(sys.argv) > 4:
+            try:
+                if not sys.argv[1].endswith('.tif') or not os.path.exists(sys.argv[1]):
+                    print "File not exist or wrong type"
+                    sys.exit(1)
+                else:
+                    inputTiff = sys.argv[1]
+                    
+                startYr = int(sys.argv[2])
+                endYr = int(sys.argv[3])
+            except ValueError:
+                print "Invalid year parameters"
+                sys.exit(1)
+            
+            if endYr < startYr or endYr > 2013 or startYr < 1980:
+                print "Invalid year parameters:[1980 - 2013]"
+                sys.exit(1)
+                
             for opt in sys.argv[4:]:
                 if opt == 'all':
                     params = supportedParam
