@@ -19,6 +19,11 @@ PROJ_NAME="trad_eemt"
 END_YEAR=$(($CUR_YEAR - 2))
 START_YEAR=1980
 
+# Generate absolute path to the install directory
+SRC="$(readlink -f $0)"
+SRC="$(dirname $SRC)"
+
+echo "$SRC"
 # Process arguments
 while getopts ":i:o:p:s:e:d:" o ; do
 	case "${o}" in 
@@ -183,23 +188,23 @@ wait
 iinit
 
 # Process inputs to prepare for parallel commands
-python read_meta.py $INPUT_DIR $DAYMET_DEM
+python ${SRC}/src/read_meta.py $INPUT_DIR $DAYMET_DEM
 
 # If read_meta.py failed, don't continue executing
 if [ $? -ne 0 ] ; then
 	echo
-	echo "Failed processing the inputs. Please check errors. Aborting...."
+	echo "Failed processing input data. Please check errors. Aborting...."
 	echo
 	exit 1
 fi
 
 # Download Daymet Information
-python process_dem.py ${INPUT_DIR}pit_c.tif $START_YEAR $END_YEAR tmin tmax prcp
+python ${SRC}/src/process_dem.py ${INPUT_DIR}pit_c.tif $START_YEAR $END_YEAR tmin tmax prcp
 
 # If process_dem.py failed, don't continue executing
 if [ $? -ne 0 ] ; then
 	echo
-	echo "Failed downloading the Daymet data. Please check errors. Aborting...."
+	echo "Failed downloading Daymet data. Please check errors. Aborting...."
 	echo
 	exit 1
 fi
